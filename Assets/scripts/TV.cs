@@ -18,6 +18,7 @@ public class TV : MonoBehaviour
 
     public Animator blinkAnimator;
     public Animator Player;
+    
     public int cutSceneIndex;
     [Header("Настройки")]
     //активный стресс
@@ -68,6 +69,7 @@ public class TV : MonoBehaviour
     public AudioClip tvNoise;
 
     public AudioSource sub1, sub2, sub3, sub4, sub5, sub6, sub7, sub8, sub9, sub10;
+    public AudioSource cutsceneAudio;
     private AudioSource audioSource;
     private AudioSource tvAudioSource;
 
@@ -329,7 +331,11 @@ public class TV : MonoBehaviour
         yield return new WaitForSeconds(1f);
         
         Player.Play("Cutscene");
-     }
+        cutsceneAudio.Play();
+        yield return new WaitForSeconds(30f);
+        SceneManager.LoadScene(0);
+
+    }
 
     public void RecursionOfGame()
     {

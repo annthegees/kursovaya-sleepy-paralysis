@@ -12,6 +12,8 @@ public class CharCntrkV2 : MonoBehaviour
     public Animator blinkAnimator;
 
     public AudioSource sub11, sub12, sub13;
+    public AudioSource footSteps;
+    public AudioSource flashlightAudio;
 
     //private bool isFlashlightOn = false;
 
@@ -26,7 +28,7 @@ public class CharCntrkV2 : MonoBehaviour
     public void OnMove(InputValue val)
     {
         _move = val.Get<Vector2>();
-
+        footSteps.Play();
     }
     private void Update()
     {
@@ -36,10 +38,12 @@ public class CharCntrkV2 : MonoBehaviour
         if (isMoving)
         {
             CMshake.Instance.ShakeCamera(2f, 0.5f);
+           
         }
         else
         {
             CMshake.Instance.ShakeCamera(0f, .0f);
+            footSteps.Stop();
         }
         
     }
@@ -66,6 +70,7 @@ public class CharCntrkV2 : MonoBehaviour
         sub12.Play();
         subtitles.instance.ShowSubtitle("темно что глаза вырви, может у меня фонарик есть?", 5);
         yield return new WaitForSeconds(6f);
+        flashlightAudio.Play();
         flashlight.SetActive(true);
         yield return new WaitForSeconds(2f);
         sub13.Play();

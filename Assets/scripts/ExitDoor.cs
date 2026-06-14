@@ -23,18 +23,14 @@ public class ExitDoor : MonoBehaviour
         {
             isEnd = true;
             screamer.SetActive(true);
-            StartCoroutine(End());
+            End();
         }
     }
-    IEnumerator End()
+    void End()
     {
-        
-
         playerController.enabled = false;
         if (_cam.TryGetComponent<CinemachineInputAxisController>(out var inputProvider))
-            inputProvider.enabled = false;
-        yield return new WaitForSeconds(1000f);
-        SceneManager.LoadScene(1);
+            inputProvider.enabled = false;       
         
     }
 }

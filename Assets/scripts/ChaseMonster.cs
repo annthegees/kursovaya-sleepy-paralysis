@@ -4,12 +4,22 @@ public class ChaseMonster : MonoBehaviour
 {
     public float speed = 2f;
     private bool hasTriggered = false;
+    private AudioSource audioSource;
+    public AudioClip steps;
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = steps;
+        audioSource.Play();
+    }
     void Update()
     {
         transform.position += transform.forward * speed * Time.deltaTime;
+        
 
     }
-    
+   
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasTriggered)
