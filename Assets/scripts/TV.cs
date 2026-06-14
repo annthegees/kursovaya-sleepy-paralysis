@@ -1,71 +1,121 @@
-using UnityEngine;
-using UnityEngine.InputSystem;
-using System;
+п»ї
+using System.Collections;
 using TMPro;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TV : MonoBehaviour
 {
-    public TextMeshProUGUI moviePercent; //шкала заполненности фильма
+    public static TV Instance { get; private set; }
 
-    public float StressVarieble = 0f;
-    public float MovieVarieble = 0f;
-    public float MaxMovie = 100f;
-    public float StressSpeed = 1f;
-    public float MovieSpeed = 1f;
-   
+    [Header("UI")]
+    public TextMeshProUGUI moviePercent; //С€РєР°Р»Р° Р·Р°РїРѕР»РЅРµРЅРЅРѕСЃС‚Рё С„РёР»СЊРјР°
 
-    //переменные для уставших глаз от долгого ппрсмотра
-    public float tieredVarieble = 5f; //сколько секунд на тв надо для усталости
-    public int spacePressesRequired = 3;
+    public Animator blinkAnimator;
+    public Animator Player;
 
+    [Header("РќР°СЃС‚СЂРѕР№РєРё")]
+    //Р°РєС‚РёРІРЅС‹Р№ СЃС‚СЂРµСЃСЃ
+
+    public float activeStressSpeed = 1f;
+
+    public float monsterSpawnVariable = 1f;
+    public float eyeSpawnVariable = 10f;
+
+    public int eyeCount = 4;
+    //РїР°СЃСЃРёРІРЅС‹Р№ СЃС‚СЂРµСЃСЃ
+
+    public float stressMax = 0f;
+    public float stressSpeed = 1f;
+
+    //С€РєР°Р»С‹ С„РёР»СЊРјР°
+
+    public float maxMovie = 100f;
+    public float movieSpeed = 1f;
+
+
+
+    [HideInInspector]
+    public bool monsterSpawned = false;
+    [HideInInspector]
+    public bool eyeSpawned = false;
+    [HideInInspector]
+    public int despawnEyeCalls = 0;
     private bool MouseOnSprite = false;
-    private Camera mainCamera;
+    private bool isWatchingTV = false;
+    //СѓРІРµР»РёС‡РёРІР°СЋС‰РёРµСЃСЏ РїРµСЂРµРјРµРЅРЅС‹Рµ
+    private float _activeStressVariable = 0f;
+    //private float _passiveStressVariable = 0f;
+    private float _movieVariable = 0f;
 
-    private float tieredTimer = 0f;
-    private bool isTiered = false; //устал тлт нет
-    private int currentSpacePresses = 0;
-    private bool monsterSpawned = false;
+    public static int _awakeCount = 0;
+    public static int _corridorCount = 0;
 
-    public static event Action StartBlink;//для моргания
-    public static event Action StopBlink;
+    private Camera _mainCamera;
 
-    public System.Action SpawnMonster;
+    public System.Action OnMonsterSpawn;
 
+    public System.Action OnEyeSpawn;
+
+    public AudioClip whisper;
+    public AudioClip tvNoise;
+
+    public AudioSource sub1, sub2, sub3, sub4, sub5, sub6, sub7, sub8, sub9, sub10;
+    private AudioSource audioSource;
+    private AudioSource tvAudioSource;
+
+    public CinemachineCamera _cam;
+
+    void Awake()
+    {
+        // РџСЂРѕРІРµСЂСЏРµРј, РЅРµ СЃРѕР·РґР°РЅ Р»Рё СѓР¶Рµ С‚Р°РєРѕР№ РѕР±СЉРµРєС‚
+        if (Instance == null)
+        {
+            Instance = this;
+           
+        }
+        else
+        {
+            // Р•СЃР»Рё СЌРєР·РµРјРїР»СЏСЂ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, СѓРґР°Р»СЏРµРј РґСѓР±Р»РёРєР°С‚
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
-        mainCamera = Camera.main;
-
-        MovieVarieble = 0;
-        UpdateMovieBar();
+        _mainCamera = Camera.main;
+        _movieVariable = 0;
         monsterSpawned = false;
+        audioSource = GetComponent<AudioSource>();
+        tvAudioSource = gameObject.AddComponent<AudioSource>();
+        tvAudioSource.loop = true;
+        
+
+        if (ExitDoor.isEnd)
+        {
+            StartCoroutine(CutScene());
+            ExitDoor.isEnd = false;  // РЎР±СЂР°СЃС‹РІР°РµРј, С‡С‚РѕР±С‹ РЅРµ РїРѕРІС‚РѕСЂСЏР»РѕСЃСЊ
+        }
+        else
+        {
+            StartCoroutine(AwakeSubtitles());
+        }
+
     }
 
     void Update()
     {
-        //нажатие лкм для снятия усталости
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        //РїСЂРѕРІРµСЂРєР° СЃРјРѕС‚СЂРµРЅРёСЏ С‚РµР»РµРІРёР·РѕСЂР°
+        if (_mainCamera != null && Mouse.current != null)
         {
-            if (isTiered)
-            {
-                currentSpacePresses++;
-
-
-                if (currentSpacePresses >= spacePressesRequired)
-                {
-                    isTiered = false;
-                    currentSpacePresses = 0;
-                    tieredTimer = 0f;
-
-                }
-            }
-        }
-
-        if (mainCamera != null && Mouse.current != null)
-        {
-            // Получаем позицию мыши 
+            // РџРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёСЋ РјС‹С€Рё 
             Vector2 mousePosition = Mouse.current.position.ReadValue();
-            Ray ray = mainCamera.ScreenPointToRay(mousePosition);
+            Ray ray = _mainCamera.ScreenPointToRay(mousePosition);
 
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
@@ -77,67 +127,217 @@ public class TV : MonoBehaviour
             }
         }
 
+
+        //СЂРѕСЃС‚ С€РєР°Р»С‹ С„РёР»СЊРјР°
         if (MouseOnSprite)
         {
-            if (!isTiered) //растет просмотр и усталость
+
+            // Р’РєР»СЋС‡Р°РµРј Р·РІСѓРє РїСЂРё РЅР°С‡Р°Р»Рµ РїСЂРѕСЃРјРѕС‚СЂР°
+            if (!isWatchingTV)
             {
-                StopBlink?.Invoke();//передача остановки моргания
-               
-                tieredTimer += Time.deltaTime;
+                tvAudioSource.clip = tvNoise;
+                tvAudioSource.loop = true;  
+                tvAudioSource.Play();
 
-                // Сохраняем старое значение для проверки
-                float oldMovieValue = MovieVarieble;
-
-                MovieVarieble += MovieSpeed * Time.deltaTime;
-                MovieVarieble = Mathf.Clamp(MovieVarieble, 0f, MaxMovie);//ограничение шкалы фильма
-
-                UpdateMovieBar();
-
-                Debug.Log("movie is up: " + MovieVarieble);
-
-                if (MovieVarieble >= 10f && !monsterSpawned)
-                {
-                    monsterSpawned = true; // Ставим флаг, чтобы не спавнить повторно
-                    SpawnMonster?.Invoke(); // Вызываем событие спавна монстра
-                    
-                }
-
-                if (tieredTimer >= tieredVarieble) //заблокирован просмотр от усталости
-                {
-                    isTiered = true;
-                    currentSpacePresses = 0;
-                    StartBlink?.Invoke(); //передача в скрипт моргания
-
-                }
-            }
-            else //растет стресс после блокировки просмотра
-            {
-                StressVarieble += StressSpeed * Time.deltaTime;
-                Debug.Log("stress is up: " + StressVarieble);
+                isWatchingTV = true;
             }
 
+            // РЎРѕС…СЂР°РЅСЏРµРј СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ РїСЂРѕРІРµСЂРєРё
+            float oldMovieValue = _movieVariable;
+
+            _movieVariable += movieSpeed * Time.deltaTime;
+            _movieVariable = Mathf.Clamp(_movieVariable, 0f, maxMovie);//РѕРіСЂР°РЅРёС‡РµРЅРёРµ С€РєР°Р»С‹ С„РёР»СЊРјР°
+
+            
+            if (_movieVariable >= monsterSpawnVariable && !monsterSpawned)
+            {
+                SpawnMonster();
+                monsterSpawnVariable = float.MaxValue;
+            }
+
+            if (_movieVariable >= eyeSpawnVariable && !eyeSpawned)
+            {
+                SpawnEye();
+                eyeSpawnVariable = float.MaxValue;
+            }
+            
         }
-
-        else //растет стресс когда не смотрю тв
+        else 
         {
-            if (!isTiered) // обнуляет усталость если отвернуться до блокировки 
+            if (isWatchingTV)
             {
-                tieredTimer = 0f;
-                StopBlink?.Invoke();//передача остановки моргания
+               tvAudioSource.Stop();  // РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј TV С€СѓРј
+                isWatchingTV = false;
             }
 
-
-            StressVarieble += StressSpeed * Time.deltaTime;
-            Debug.Log("stress is up: " + StressVarieble);
         }
 
+        if (monsterSpawned)
+        {
+            _activeStressVariable += activeStressSpeed * Time.deltaTime;
+            _activeStressVariable = Mathf.Clamp(_activeStressVariable, 0f, stressMax);
+            
+        }
+        if (eyeSpawned)
+        {
+            _activeStressVariable += activeStressSpeed * Time.deltaTime;
+            _activeStressVariable = Mathf.Clamp(_activeStressVariable, 0f, stressMax);
+        }
+        
+        UpdateMovieBar();
 
+        if (_activeStressVariable >= stressMax)
+        {
+            RecursionOfGame();
+        }
+        Debug.Log(monsterSpawned);
+
+
+
+        
 
 
     }
-    //заполнение шкалы на экране
+
+    private void SpawnMonster()
+    {
+        monsterSpawned = true;
+        OnMonsterSpawn?.Invoke();
+        StartCoroutine(monsterSpawnedSubtitles());
+
+    }
+    public void DespawnMonster()
+    {
+        monsterSpawned = false;
+        eyeSpawned = false;
+        _activeStressVariable = 0f;
+        StartCoroutine(monsterDespawnedSubtitles());
+    }
+
+    private void SpawnEye()
+    {
+        eyeSpawned = true;
+        OnEyeSpawn?.Invoke();
+        audioSource.PlayOneShot(whisper);
+        StartCoroutine(eyeSpawnedSubtitles());
+    }
+    public void DespawnEye()
+    {
+        despawnEyeCalls++;
+        if (despawnEyeCalls >= eyeCount)
+        {
+            monsterSpawned = false;
+            eyeSpawned = false;
+            _activeStressVariable = 0f;
+            StartCoroutine(eyeDespawnedAnim());
+            _corridorCount++;
+        }
+    }
+    IEnumerator AwakeSubtitles()
+    {
+        if (_awakeCount == 0)
+        {
+            yield return new WaitForSeconds(3f);
+            sub1.Play();
+            subtitles.instance.ShowSubtitle("СЏ СѓСЃРЅСѓР»Р°? РјС‹ Р¶Рµ С‚РѕР»СЊРєРѕ С‡С‚Рѕ С„РёР»СЊРј СЃРјРѕС‚СЂРµР»Рё", 5);
+            yield return new WaitForSeconds(5f);
+
+            sub2.Play();
+            subtitles.instance.ShowSubtitle("С‚РµР»Рѕ РєР°Рє Р±СѓРґС‚Рѕ РїР°СЂР°Р»РёР·РѕРІР°Р»Рѕ", 5f);
+            yield return new WaitForSeconds(5f);
+            sub3.Play();
+            subtitles.instance.ShowSubtitle("С‚РѕР»СЊРєРѕ РіРѕР»РѕРІРѕР№ Рё РјРѕРіСѓ РІРµСЂС‚РµС‚СЊ, Рё РїРѕС‡РµРјСѓ С‚РµР»РµРІРёР·РѕСЂ РЅРµ РІС‹РєР»СЋС‡РµРЅ?", 6f);
+
+        }
+        else
+        {
+            sub4.Play();
+            yield return new WaitForSeconds(3f);
+            subtitles.instance.ShowSubtitle("СЏ.. РіРґРµ-С‚Рѕ РѕС€РёР±Р»Р°СЃСЊ?", 5);
+        }
+        
+    }
+
+    IEnumerator monsterSpawnedSubtitles()
+    {
+        if (_awakeCount == 0)
+        {
+            sub5.Play();
+            yield return new WaitForSeconds(3f);
+            subtitles.instance.ShowSubtitle("РµСЃР»Рё СЏ РµРіРѕ РЅРµ РІРёР¶Сѓ С‚Рѕ Рё РѕРЅ РјРµРЅСЏ РЅРµ РІРёРґРёС‚, РІРµРґСЊ С‚Р°Рє РґР°?", 5);
+        }
+        else
+        {
+            sub6.Play();
+            yield return new WaitForSeconds(1f);
+            subtitles.instance.ShowSubtitle("РІРѕ РІС‚РѕСЂРѕР№ СЂР°Р· С‚С‹ СѓР¶Рµ РґР°Р¶Рµ РЅРµ С‚Р°РєРѕР№ СЃС‚СЂР°С€РЅС‹Р№", 5);
+        }
+       
+    }
+    IEnumerator monsterDespawnedSubtitles()
+    {
+        if (_awakeCount == 0)
+        {
+            sub7.Play();
+            yield return new WaitForSeconds(1f);
+            subtitles.instance.ShowSubtitle("РёСЃС‡РµР·.. РІРёРґР°С‚СЊ РЅСѓР¶РЅРѕ Р±С‹Р»Рѕ РІСЃРµ-С‚Р°РєРё СЃРјРѕС‚СЂРµС‚СЊ", 5);
+        }
+        else
+        {
+            sub8.Play();
+            yield return new WaitForSeconds(1f);
+            subtitles.instance.ShowSubtitle("РЅР°РґРµСЋСЃСЊ СЌС‚Рѕ РїРѕСЃР»РµРґРЅРёР№ СЂР°Р· РєРѕРіРґР° СЏ С‚РµР±СЏ РІРёРґРµР»Р°", 5);
+        }
+
+    }
+    IEnumerator eyeSpawnedSubtitles()
+    {
+        
+        if (_awakeCount == 0)
+        {
+            sub9.Play();
+            yield return new WaitForSeconds(1f);
+            subtitles.instance.ShowSubtitle("РјРЅРµ СѓР¶Рµ РЅРµ СЃРјРµС€РЅРѕ, С‡С‚Рѕ РїСЂРѕРёСЃС…РѕРґРёС‚", 4);
+
+        }
+        else
+        {
+            sub10.Play();
+            yield return new WaitForSeconds(1f);
+            subtitles.instance.ShowSubtitle("Р° РІС‹ Рё РІ РїРµСЂРІС‹Р№ СЂР°Р· РЅРµ Р±С‹Р»Рё", 5);
+        }
+     }
+    IEnumerator eyeDespawnedAnim()
+    {
+        blinkAnimator.SetTrigger("closeEye");
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(2);
+    }
+    IEnumerator CutScene()
+    {
+        StopCoroutine(AwakeSubtitles());
+        _mainCamera = null;
+        //_cam.enabled = false;
+        if (_cam.TryGetComponent<CinemachineInputAxisController>(out var inputProvider))
+            inputProvider.enabled = false;
+        yield return new WaitForSeconds(1f);
+        
+        Player.Play("Cutscene");
+     }
+
+    public void RecursionOfGame()
+    {
+        _awakeCount ++;
+        SceneManager.LoadScene(1);
+        
+    }
     void UpdateMovieBar()
     {
-        moviePercent.text = "Movie: " + MovieVarieble.ToString("F1");
+        moviePercent.text = "M" + _movieVariable.ToString("F1") + "s"  + "as" + _activeStressVariable.ToString("F1");
+      
     }
+
+
 }
+
+
