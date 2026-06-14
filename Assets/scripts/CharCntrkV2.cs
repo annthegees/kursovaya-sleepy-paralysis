@@ -11,6 +11,8 @@ public class CharCntrkV2 : MonoBehaviour
     public GameObject flashlight;
     public Animator blinkAnimator;
 
+    public AudioSource sub11, sub12, sub13;
+
     //private bool isFlashlightOn = false;
 
     private Vector2 _move;
@@ -58,12 +60,15 @@ public class CharCntrkV2 : MonoBehaviour
     IEnumerator startSubtitles()
     {
         yield return new WaitForSeconds(3f);
+        sub11.Play();
         subtitles.instance.ShowSubtitle("это когда нибудь вообще закончиться?", 5);
         yield return new WaitForSeconds(5f);
+        sub12.Play();
         subtitles.instance.ShowSubtitle("темно что глаза вырви, может у меня фонарик есть?", 5);
         yield return new WaitForSeconds(6f);
         flashlight.SetActive(true);
         yield return new WaitForSeconds(2f);
+        sub13.Play();
         subtitles.instance.ShowSubtitle("серьезно что-ли", 5);
     }
 }

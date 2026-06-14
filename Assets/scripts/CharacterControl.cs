@@ -10,6 +10,7 @@ public class CharacterControl : MonoBehaviour
     private Camera mainCamera;
     public Animator blinkAnimator;
 
+    public AudioSource sub15, sub16;
     void Start()
     {
         mainCamera = Camera.main; 
@@ -36,18 +37,22 @@ public class CharacterControl : MonoBehaviour
     }
     IEnumerator StartSubtitles()
     {
-        if (TV._corridorCount == 1)
+        if (TV._corridorCount <= 1)
         {
-            yield return new WaitForSeconds(2f);
-            subtitles.instance.ShowSubtitle("я все еще сплю", 5);
+            
+            yield return new WaitForSeconds(0f);
+            sub15.Play();
+            subtitles.instance.ShowSubtitle("я все еще сплю", 3);
 
-            yield return new WaitForSeconds(5f);
-            subtitles.instance.ShowSubtitle("я могу ползти? надо поторопиться, мне кажется кто-то идет за мной", 5);
+            yield return new WaitForSeconds(3f);
+            sub16.Play();
+            subtitles.instance.ShowSubtitle("теперь могу ползти? надо поторопиться, мне кажется я слышу шаги сзади", 5);
         }
         else
         {
             yield return new WaitForSeconds(2f);
-            subtitles.instance.ShowSubtitle("это уже начинает надоедать", 5);
+            sub15.Play();
+            subtitles.instance.ShowSubtitle("я все еще сплю", 5);
         }
     }
 

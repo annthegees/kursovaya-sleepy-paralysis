@@ -1776,7 +1776,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.11772156, y: 1.2267455, z: 0.103}
+  m_LocalPosition: {x: 0.11772156, y: 1.2037455, z: 0.103}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3116,7 +3116,7 @@ Transform:
   m_GameObject: {fileID: 449191736}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.131, y: 0.72, z: 0.032}
+  m_LocalPosition: {x: 0.131, y: 0.697, z: 0.032}
   m_LocalScale: {x: 0.47423, y: 0.69512415, z: 0.56102}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3345,6 +3345,7 @@ MonoBehaviour:
   moviePercent: {fileID: 937191006}
   blinkAnimator: {fileID: 638461592}
   Player: {fileID: 449191743}
+  cutSceneIndex: 1
   activeStressSpeed: 1
   monsterSpawnVariable: 23
   eyeSpawnVariable: 2
@@ -3356,6 +3357,7 @@ MonoBehaviour:
   monsterSpawned: 0
   eyeSpawned: 0
   despawnEyeCalls: 0
+  crosshair: {fileID: 509718406}
   whisper: {fileID: 8300000, guid: 446cb8542b3355a4983b27e4d679f191, type: 3}
   tvNoise: {fileID: 8300000, guid: c1dde6b5272336c4f8ab0ec6c54415fc, type: 3}
   sub1: {fileID: 1248416484}
@@ -9016,7 +9018,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 837.1}
+  m_AnchoredPosition: {x: 0, y: 814.23}
   m_SizeDelta: {x: 1920, y: 540}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1733314431

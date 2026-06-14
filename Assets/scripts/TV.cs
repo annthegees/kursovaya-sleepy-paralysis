@@ -18,7 +18,7 @@ public class TV : MonoBehaviour
 
     public Animator blinkAnimator;
     public Animator Player;
-
+    public int cutSceneIndex;
     [Header("Настройки")]
     //активный стресс
 
@@ -62,6 +62,8 @@ public class TV : MonoBehaviour
 
     public System.Action OnEyeSpawn;
 
+    public Canvas crosshair;
+
     public AudioClip whisper;
     public AudioClip tvNoise;
 
@@ -94,7 +96,7 @@ public class TV : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         tvAudioSource = gameObject.AddComponent<AudioSource>();
         tvAudioSource.loop = true;
-        
+        blinkAnimator.SetTrigger("openEye");
 
         if (ExitDoor.isEnd)
         {
@@ -104,6 +106,7 @@ public class TV : MonoBehaviour
         else
         {
             StartCoroutine(AwakeSubtitles());
+            Player.SetLayerWeight(cutSceneIndex, 0f);
         }
 
     }
@@ -251,8 +254,9 @@ public class TV : MonoBehaviour
         }
         else
         {
-            sub4.Play();
+            
             yield return new WaitForSeconds(3f);
+            sub4.Play();
             subtitles.instance.ShowSubtitle("я.. где-то ошиблась?", 5);
         }
         
@@ -304,7 +308,7 @@ public class TV : MonoBehaviour
         {
             sub10.Play();
             yield return new WaitForSeconds(1f);
-            subtitles.instance.ShowSubtitle("а вы и в первый раз не были", 5);
+            subtitles.instance.ShowSubtitle("...", 5);
         }
      }
     IEnumerator eyeDespawnedAnim()
@@ -317,6 +321,8 @@ public class TV : MonoBehaviour
     {
         StopCoroutine(AwakeSubtitles());
         _mainCamera = null;
+        crosshair.enabled = false;
+        
         //_cam.enabled = false;
         if (_cam.TryGetComponent<CinemachineInputAxisController>(out var inputProvider))
             inputProvider.enabled = false;

@@ -7,6 +7,8 @@ public class MazeDoors : MonoBehaviour
 
     private CharacterController playerController;
 
+    
+
     private int _tpCount = 0;
     private void Start()
     {
@@ -46,6 +48,7 @@ public class MazeDoors : MonoBehaviour
         if (_tpCount == 1)
         {
             yield return new WaitForSeconds(1f);
+            
             subtitles.instance.ShowSubtitle("где я?", 4);
         }
         else
