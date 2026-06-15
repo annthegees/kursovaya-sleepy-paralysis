@@ -22,7 +22,10 @@ public class Menu : MonoBehaviour
     {
         SceneManager.LoadScene(gameScene);
     }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 
-    
 
 }

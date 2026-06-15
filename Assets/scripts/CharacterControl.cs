@@ -40,7 +40,7 @@ public class CharacterControl : MonoBehaviour
         if (TV._corridorCount <= 1)
         {
             
-            yield return new WaitForSeconds(0f);
+            yield return new WaitForSeconds(0.5f);
             sub15.Play();
             subtitles.instance.ShowSubtitle("я все еще сплю", 3);
 

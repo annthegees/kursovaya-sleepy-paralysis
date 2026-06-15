@@ -46,7 +46,7 @@ public class MazeScreamer : MonoBehaviour
     }
     IEnumerator Screamer()
     {
-        SceneManager.LoadScene(1);
+        
         yield return new WaitForSeconds(3f);
         scream.Play();
         screamerImage.enabled = true;

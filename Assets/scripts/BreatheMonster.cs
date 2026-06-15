@@ -8,7 +8,8 @@ public class BreatheMonster : MonoBehaviour
     public Image monster;
     public CanvasGroup vignette;
     public AudioClip breathing;
-    
+
+    public Animator DespawnAnim;
     // Длительность появления виньетки
     private float fadeDuration = 2f;
     private float _vignetteTimer = 0f;
@@ -74,8 +75,14 @@ public class BreatheMonster : MonoBehaviour
         if (MouseOnSprite)
         {
             _monsterVariable += Time.deltaTime;
-            
+            DespawnAnim.SetTrigger("shaking");
+
         }
+        else
+        {
+            DespawnAnim.Play("MonsterIdle");
+        }
+
 
         if (_monsterVariable >= monsterMax)
         {

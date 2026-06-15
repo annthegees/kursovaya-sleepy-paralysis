@@ -83,11 +83,7 @@ public class TV : MonoBehaviour
             Instance = this;
            
         }
-        else
-        {
-            // Если экземпляр уже существует, удаляем дубликат
-            Destroy(gameObject);
-        }
+        
     }
 
     void Start()
@@ -195,11 +191,7 @@ public class TV : MonoBehaviour
         {
             RecursionOfGame();
         }
-        Debug.Log(monsterSpawned);
-
-
-
-        
+              
 
 
     }
@@ -242,14 +234,14 @@ public class TV : MonoBehaviour
     {
         if (_awakeCount == 0)
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1f);
             sub1.Play();
             subtitles.instance.ShowSubtitle("я уснула? мы же только что фильм смотрели", 5);
             yield return new WaitForSeconds(5f);
-
+/*
             sub2.Play();
             subtitles.instance.ShowSubtitle("тело как будто парализовало", 5f);
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(5f);*/
             sub3.Play();
             subtitles.instance.ShowSubtitle("только головой и могу вертеть, и почему телевизор не выключен?", 6f);
 
@@ -268,14 +260,16 @@ public class TV : MonoBehaviour
     {
         if (_awakeCount == 0)
         {
+            yield return new WaitForSeconds(1f);
             sub5.Play();
-            yield return new WaitForSeconds(3f);
-            subtitles.instance.ShowSubtitle("если я его не вижу то и он меня не видит, ведь так да?", 5);
+            
+            subtitles.instance.ShowSubtitle("я не буду смотреть на него, а он на меня, договорились?", 5);
         }
         else
         {
-            sub6.Play();
+            
             yield return new WaitForSeconds(1f);
+            sub6.Play();
             subtitles.instance.ShowSubtitle("во второй раз ты уже даже не такой страшный", 5);
         }
        
@@ -284,15 +278,17 @@ public class TV : MonoBehaviour
     {
         if (_awakeCount == 0)
         {
-            sub7.Play();
+            
             yield return new WaitForSeconds(1f);
+            sub7.Play();
             subtitles.instance.ShowSubtitle("исчез.. видать нужно было все-таки смотреть", 5);
         }
         else
         {
-            sub8.Play();
+            
             yield return new WaitForSeconds(1f);
-            subtitles.instance.ShowSubtitle("надеюсь это последний раз когда я тебя видела", 5);
+            sub8.Play();
+            subtitles.instance.ShowSubtitle("надеюсь мы больше не увидимся", 5);
         }
 
     }
@@ -301,21 +297,23 @@ public class TV : MonoBehaviour
         
         if (_awakeCount == 0)
         {
-            sub9.Play();
+            
             yield return new WaitForSeconds(1f);
+            sub9.Play();
             subtitles.instance.ShowSubtitle("мне уже не смешно, что происходит", 4);
 
         }
         else
         {
-            sub10.Play();
+            
             yield return new WaitForSeconds(1f);
+            sub10.Play();
             subtitles.instance.ShowSubtitle("...", 5);
         }
      }
     IEnumerator eyeDespawnedAnim()
     {
-        blinkAnimator.SetTrigger("closeEye");
+        blinkAnimator.Play("closeEyes");
         yield return new WaitForSeconds(2f);
         SceneManager.LoadScene(2);
     }

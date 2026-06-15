@@ -28,8 +28,15 @@ public class CharCntrkV2 : MonoBehaviour
     public void OnMove(InputValue val)
     {
         _move = val.Get<Vector2>();
+  
         footSteps.Play();
-    }
+
+        if (ExitDoor.isEnd == true)
+        {
+            footSteps.Stop();
+        }
+
+        }
     private void Update()
     {
         _charCntrl.Move((GetForward() * _move.y + GetRight() * _move.x) * Time.deltaTime * speed);
@@ -63,7 +70,7 @@ public class CharCntrkV2 : MonoBehaviour
     }
     IEnumerator startSubtitles()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         sub11.Play();
         subtitles.instance.ShowSubtitle("это когда нибудь вообще закончиться?", 5);
         yield return new WaitForSeconds(5f);
