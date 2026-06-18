@@ -17,13 +17,7 @@ public class subtitles : MonoBehaviour
     public float fadeInTime = 0.2f;
     public float fadeOutTime = 0.3f;
 
-    /*public string[] AwakeMonologue;
-    public TextMeshProUGUI subtitleText;
-    public float charsDelay = 0.05f;
-    public float delayBetweenLines = 1f;
-
-    public Action SpawnMonster;
-    */
+    
     private Coroutine currentSubtitle;
     
 
@@ -73,15 +67,7 @@ public class subtitles : MonoBehaviour
         currentSubtitle = null;
     }
 
-    // Быстрый метод (без анимации, для важных моментов)
-    public void ShowSubtitleInstant(string text, float duration = 2f)
-    {
-        if (currentSubtitle != null)
-            StopCoroutine(currentSubtitle);
-
-        subtitleText.text = text;
-        currentSubtitle = StartCoroutine(HideAfterDelay(duration));
-    }
+    
 
     IEnumerator HideAfterDelay(float duration)
     {
