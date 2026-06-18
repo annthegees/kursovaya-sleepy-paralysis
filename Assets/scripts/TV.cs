@@ -2,12 +2,9 @@
 using System.Collections;
 using TMPro;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class TV : MonoBehaviour
 {
@@ -18,23 +15,21 @@ public class TV : MonoBehaviour
 
     public Animator blinkAnimator;
     public Animator Player;
-    
-    public int cutSceneIndex;
-    [Header("Настройки")]
-    //активный стресс
+    public Canvas crosshair;
 
+    [Header("Настройки")]
+
+    public int cutSceneIndex;//для показа катсцены без айдл аним
     public float activeStressSpeed = 1f;
 
     public float monsterSpawnVariable = 1f;
     public float eyeSpawnVariable = 10f;
 
-    public int eyeCount = 4;
-    //пассивный стресс
+    public int eyeCount = 4; 
 
     public float stressMax = 0f;
-    public float stressSpeed = 1f;
+    
 
-    //шкалы фильма
 
     public float maxMovie = 100f;
     public float movieSpeed = 1f;
@@ -47,14 +42,18 @@ public class TV : MonoBehaviour
     public bool eyeSpawned = false;
     [HideInInspector]
     public int despawnEyeCalls = 0;
+
     private bool MouseOnSprite = false;
     private bool isWatchingTV = false;
+
     //увеличивающиеся переменные
     private float _activeStressVariable = 0f;
-    //private float _passiveStressVariable = 0f;
     private float _movieVariable = 0f;
 
+    //счет циклов прохождения
+    [HideInInspector]
     public static int _awakeCount = 0;
+    [HideInInspector]
     public static int _corridorCount = 0;
 
     private Camera _mainCamera;
@@ -63,7 +62,7 @@ public class TV : MonoBehaviour
 
     public System.Action OnEyeSpawn;
 
-    public Canvas crosshair;
+    
 
     public AudioClip whisper;
     public AudioClip tvNoise;
@@ -81,19 +80,18 @@ public class TV : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-           
         }
-        
     }
 
     void Start()
     {
         _mainCamera = Camera.main;
         _movieVariable = 0;
-        monsterSpawned = false;
+        //monsterSpawned = false;
         audioSource = GetComponent<AudioSource>();
         tvAudioSource = gameObject.AddComponent<AudioSource>();
         tvAudioSource.loop = true;
+        tvAudioSource.volume = 0.3f;
         blinkAnimator.SetTrigger("openEye");
 
         if (ExitDoor.isEnd)
@@ -120,7 +118,7 @@ public class TV : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
-                MouseOnSprite = hit.collider.gameObject == gameObject;
+                MouseOnSprite = hit.collider.gameObject == gameObject; //тру если смотрим
             }
             else
             {
@@ -153,7 +151,7 @@ public class TV : MonoBehaviour
             if (_movieVariable >= monsterSpawnVariable && !monsterSpawned)
             {
                 SpawnMonster();
-                monsterSpawnVariable = float.MaxValue;
+                monsterSpawnVariable = float.MaxValue;//чтоб значение не росло больше
             }
 
             if (_movieVariable >= eyeSpawnVariable && !eyeSpawned)
@@ -176,7 +174,7 @@ public class TV : MonoBehaviour
         if (monsterSpawned)
         {
             _activeStressVariable += activeStressSpeed * Time.deltaTime;
-            _activeStressVariable = Mathf.Clamp(_activeStressVariable, 0f, stressMax);
+            _activeStressVariable = Mathf.Clamp(_activeStressVariable, 0f, stressMax);//ограничитель для стресса
             
         }
         if (eyeSpawned)
@@ -184,16 +182,7 @@ public class TV : MonoBehaviour
             _activeStressVariable += activeStressSpeed * Time.deltaTime;
             _activeStressVariable = Mathf.Clamp(_activeStressVariable, 0f, stressMax);
         }
-        
-        UpdateMovieBar();
-
-        if (_activeStressVariable >= stressMax)
-        {
-            RecursionOfGame();
-        }
-              
-
-
+     
     }
 
     private void SpawnMonster()
@@ -238,10 +227,6 @@ public class TV : MonoBehaviour
             sub1.Play();
             subtitles.instance.ShowSubtitle("я уснула? мы же только что фильм смотрели", 5);
             yield return new WaitForSeconds(5f);
-/*
-            sub2.Play();
-            subtitles.instance.ShowSubtitle("тело как будто парализовало", 5f);
-            yield return new WaitForSeconds(5f);*/
             sub3.Play();
             subtitles.instance.ShowSubtitle("только головой и могу вертеть, и почему телевизор не выключен?", 6f);
 
@@ -331,6 +316,7 @@ public class TV : MonoBehaviour
         Player.Play("Cutscene");
         cutsceneAudio.Play();
         yield return new WaitForSeconds(30f);
+
         SceneManager.LoadScene(0);
 
     }
@@ -341,13 +327,7 @@ public class TV : MonoBehaviour
         SceneManager.LoadScene(1);
         
     }
-    void UpdateMovieBar()
-    {
-        moviePercent.text = "M" + _movieVariable.ToString("F1") + "s"  + "as" + _activeStressVariable.ToString("F1");
-      
-    }
-
-
+  
 }
 
 

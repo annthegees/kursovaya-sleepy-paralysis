@@ -18,8 +18,8 @@ public class MazeDoors : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
 
-        // Проверяем, что вошёл игрок и триггер ещё не срабатывал
-        if (other.CompareTag("Player") /*&& (!hasTriggered)*/)
+        // Проверяем, что вошёл игрок 
+        if (other.CompareTag("Player") )
         {
             playerController = other.GetComponent<CharacterController>();
 

@@ -16,6 +16,8 @@ public class Menu : MonoBehaviour
         audioSource.clip = bgm;
         audioSource.loop = true;
         audioSource.Play();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
     }
     public void ToGame()
